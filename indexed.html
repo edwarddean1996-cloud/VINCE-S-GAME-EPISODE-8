@@ -1,0 +1,709 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>I HAD CREAM – The Edwina Dean Episode</title>
+  <style>
+    body {
+      background: #000;
+      color: #33ff33;
+      font-family: "Courier New", monospace;
+      margin: 0;
+      padding: 16px;
+    }
+    #game {
+      max-width: 800px;
+      margin: 0 auto;
+      border: 2px solid #006600;
+      padding: 16px;
+      background: #000800;
+      box-shadow: 0 0 16px #003300;
+    }
+    #title {
+      font-size: 20px;
+      margin-bottom: 4px;
+      text-shadow: 0 0 4px #00ff00;
+    }
+    #subtitle {
+      font-size: 12px;
+      opacity: 0.8;
+      margin-bottom: 12px;
+    }
+    #art {
+      white-space: pre;
+      background: #000;
+      padding: 8px;
+      border: 1px solid #004400;
+      margin-bottom: 10px;
+      overflow-x: auto;
+    }
+    #text {
+      white-space: pre-wrap;
+      line-height: 1.4;
+      margin-bottom: 10px;
+    }
+    .choice {
+      display: block;
+      width: 100%;
+      text-align: left;
+      margin: 4px 0;
+      padding: 8px 10px;
+      border: 1px solid #005500;
+      background: #001900;
+      color: #66ff66;
+      cursor: pointer;
+    }
+    .choice:hover {
+      background: #003300;
+    }
+  </style>
+</head>
+<body>
+<div id="game">
+  <div id="title">I HAD CREAM – The Edwina Dean Infiltration</div>
+  <div id="subtitle">lo-fi farm drama / 8-bit seduction psy-op</div>
+  <pre id="art"></pre>
+  <div id="text"></div>
+  <div id="choices"></div>
+</div>
+
+<script>
+  // -------- basic engine --------
+  const artEl = document.getElementById("art");
+  const textEl = document.getElementById("text");
+  const choicesEl = document.getElementById("choices");
+
+  function showScene(text, art, choices) {
+    textEl.textContent = text;
+    artEl.textContent = art || "";
+    choicesEl.innerHTML = "";
+    (choices || []).forEach(function(choice) {
+      const btn = document.createElement("button");
+      btn.textContent = "> " + choice.label;
+      btn.className = "choice";
+      btn.onclick = choice.next;
+      choicesEl.appendChild(btn);
+    });
+  }
+
+  // -------- ASCII art --------
+  const artFarm = `
+      ___  ___  ___
+     | F || A || R |
+     |___||___||___|
+        /\\     /\\
+       /  \\   /  \\
+    (goats) (lesbians)
+       ||      ||
+    ~ the farm at dawn ~
+`;
+
+  const artHeels = `
+      * click *    * click *    * click *
+
+           _________
+          /  ____  \\
+         |  |DD| | |
+         |__|__|_| |
+           ( ^__^ )   ← Edwina Dean
+          /| IHC |\\   (I HAD CREAM)
+           |____|
+
+      a bisexual boss battle approaches
+`;
+
+  const artBelle = `
+   BELLE.EXE
+   ----------
+      (ಠ_ಠ)
+   immune to seduction
+   suspicious of moisturiser
+`;
+
+  const artThirst = `
+   NICK:  (✿◠‿◠)
+   VINCE: (｡♥‿♥｡)
+   HANA:  (ง •̀_•́)ง
+   DARCY: lurking in rafters
+
+   all of them: low-key hypnotised
+`;
+
+  const artWorkshop = `
+     " C R E A M   W O R K S H O P "
+
+       [ fairy lights ]   [ rugs ]
+          (✨)             (✨)
+
+     EDWINA: centre of the barn
+     EVERYONE: sitting in a circle
+     BELLE: standing, refusing to sit
+`;
+
+  const artEject = `
+      E D W I N A   E J E C T E D
+
+          ( ͡° ͜ʖ ͡°)  →   (  •́︿•̀ )
+               \\          /
+                \\        /
+                 [ B A R N   D O O R ]
+`;
+
+  const artStay = `
+      E D W I N A   S T A Y S
+
+         ( ✧ω✧ )  ← Edwina
+         (ಠ_ಠ )   ← Belle
+        farm: permanently feral
+`;
+
+  const artSoft = `
+      F A R M   R E C O V E R Y
+
+      [ table ]  [ tea ]  [ flannel ]
+           \\        |        /
+             ~ everyone ~
+      trying not to talk about
+      how hot the villain was
+`;
+
+  // -------- state --------
+  const state = {
+    edwinaInfluence: 0,  // how thirsty everyone is
+    belleTrustsYou: 0,   // if high, Belle listens to you later
+    almostBrokeUp: false
+  };
+
+  // -------- scenes --------
+  function startGame() {
+    state.edwinaInfluence = 0;
+    state.belleTrustsYou = 0;
+    state.almostBrokeUp = false;
+
+    showScene(
+      "DAWN ON THE FARM.\n\n" +
+      "The goats chew grass. Belle reorganises the pantry by emotional temperature.\n" +
+      "Nick reads theory upside down. Vince sighs at the sky. Hana lifts something heavy\n" +
+      "for fun. Darcy exists only in the rafters.\n\n" +
+      "Then you hear it.\n\n" +
+      "heels.\n" +
+      "on.\n" +
+      "gravel.",
+      artFarm,
+      [
+        { label: "Turn toward the sound", next: sceneHeels },
+        { label: "Hide behind Belle", next: sceneHideBehindBelle },
+        { label: "Pretend nothing is happening", next: sceneDeny }
+      ]
+    );
+  }
+
+  function sceneHideBehindBelle() {
+    state.belleTrustsYou += 1;
+    showScene(
+      "You duck behind Belle like she’s emotional armour.\n\n" +
+      "Belle doesn’t turn.\n“Coward,” she says calmly.\n\n" +
+      "The heels keep coming.",
+      artBelle,
+      [
+        { label: "Okay fine, turn around", next: sceneHeels }
+      ]
+    );
+  }
+
+  function sceneDeny() {
+    showScene(
+      "You stare at the horizon.\n\n" +
+      "If you don’t look, nothing is happening.\nRight?\n\n" +
+      "* click *   * click *   * click *\n\n" +
+      "Okay yeah, something is happening.",
+      "",
+      [
+        { label: "Turn slowly toward the sound", next: sceneHeels }
+      ]
+    );
+  }
+
+  function sceneHeels() {
+    showScene(
+      "She steps into view.\nSunglasses. Clipboard. Aura of expensive moisturiser.\n\n" +
+      "Edwina Dean.\n\n" +
+      "Alias: “I HAD CREAM.”\n\n" +
+      "Everyone except Belle: instantly too interested.",
+      artHeels,
+      [
+        { label: "Stare at her like everyone else", next: sceneArriveGeneral },
+        { label: "Watch Belle instead", next: sceneCheckBelleEarly },
+        { label: "Try to introduce yourself", next: sceneApproachEdwina }
+      ]
+    );
+  }
+
+  function sceneCheckBelleEarly() {
+    state.belleTrustsYou += 1;
+    showScene(
+      "Belle watches Edwina the way a cat watches a laser pointer.\n\n" +
+      "Belle: “Absolutely not.”\n\n" +
+      "Edwina hasn’t even spoken yet.",
+      artBelle,
+      [
+        { label: "Stay near Belle (safe)", next: sceneArriveGeneral },
+        { label: "Abandon safety, move closer to Edwina", next: sceneApproachEdwina }
+      ]
+    );
+  }
+
+  function sceneArriveGeneral() {
+    state.edwinaInfluence += 1;
+    showScene(
+      "Edwina slides her sunglasses down.\nThe morning feels suddenly… curated.\n\n" +
+      "Edwina: “Good morning. I’m here for a cream consultation.”\n\n" +
+      "Nick: “That sounds academic.”\nVince: “That sounds… intimate.”\nHana: “Does it involve protein?”\nDarcy (from a beam): “Does it involve blood?”\n\n" +
+      "Belle: “No one answer that.”",
+      artThirst,
+      [
+        { label: "Ask what ‘cream consultation’ even means", next: sceneAskCream },
+        { label: "Let her keep talking", next: sceneMissionHint },
+        { label: "Side with Belle, call bullshit", next: sceneSideWithBelle }
+      ]
+    );
+  }
+
+  function sceneApproachEdwina() {
+    state.edwinaInfluence += 2;
+    showScene(
+      "You step closer.\nShe turns that slow, targeted smile on you.\n\n" +
+      "Edwina: “Oh. You must be… receptive.”\n\n" +
+      "Belle: “BACK AWAY FROM THE AGENT OF CHAOS.”",
+      artHeels,
+      [
+        { label: "Ask her name", next: sceneAskName },
+        { label: "Blurt out that you love her vibe (weak)", next: sceneFlustered }
+      ]
+    );
+  }
+
+  function sceneFlustered() {
+    state.edwinaInfluence += 1;
+    showScene(
+      "You: “Your… whole… thing… is… wow.”\n\n" +
+      "Edwina: “Thank you.”\nBelle: “I’m going to burn this barn down.”",
+      artThirst,
+      [
+        { label: "Recover and ask why she’s here", next: sceneMissionHint },
+        { label: "Retreat to Belle in embarrassment", next: sceneSideWithBelle }
+      ]
+    );
+  }
+
+  function sceneAskName() {
+    state.edwinaInfluence += 1;
+    showScene(
+      "You: “Who are you?”\n\nShe removes her sunglasses.\nThe goats pause mid-chew.\n\n" +
+      "Edwina: “I’m Edwina Dean. But professionally… I HAD CREAM.”\n\n" +
+      "Belle: “No you fucking aren’t.”",
+      artHeels,
+      [
+        { label: "Ask what ‘I HAD CREAM’ stands for", next: sceneAskCream },
+        { label: "Laugh, which she somehow likes", next: sceneMissionHint }
+      ]
+    );
+  }
+
+  function sceneAskCream() {
+    showScene(
+      "You: “What does I HAD CREAM even stand for?”\n\n" +
+      "Edwina: “International Handler And Deviant Consultant Re: Emotional And Amorous Manipulation.”\n\n" +
+      "Nick: “…that’s so bad it loops back to iconic.”\nBelle: “That’s a red flag written in moisturiser.”",
+      "",
+      [
+        { label: "Admit that sounds terrifying", next: sceneSideWithBelle },
+        { label: "Admit that sounds hot", next: sceneMissionHint }
+      ]
+    );
+  }
+
+  function sceneSideWithBelle() {
+    state.belleTrustsYou += 2;
+    showScene(
+      "You move closer to Belle.\nThe air feels less warped here.\n\n" +
+      "Belle: “Correct. We’re in a psy-op. Do not make eye contact.”\n\n" +
+      "Edwina smiles like she heard that and is enjoying it.",
+      artBelle,
+      [
+        { label: "Confront Edwina directly", next: sceneMissionRevealSetup },
+        { label: "Let her speak and collect intel", next: sceneMissionHint }
+      ]
+    );
+  }
+
+  function sceneMissionHint() {
+    state.edwinaInfluence += 1;
+    showScene(
+      "Edwina walks slowly around the group like she’s inspecting art.\n\n" +
+      "She murmurs different things to each of them:\n\n" +
+      "To Nick: “You’re wasted here.”\n" +
+      "To Vince: “You’re the emotional core. They don’t understand you.”\n" +
+      "To Hana: “You’re a leader. They’re afraid of your power.”\n" +
+      "To Darcy: “You don’t have to hide in shadows.”\n\n" +
+      "Everyone blushes in different fonts.\nBelle looks like she’s going to explode.",
+      artThirst,
+      [
+        { label: "Interrupt and demand the truth", next: sceneMissionRevealSetup },
+        { label: "Watch it play out (danger)", next: sceneSeductionSpreads }
+      ]
+    );
+  }
+
+  function sceneSeductionSpreads() {
+    state.edwinaInfluence += 2;
+    state.almostBrokeUp = true;
+    showScene(
+      "The farm’s emotional wifi starts glitching.\n\n" +
+      "Nick is suddenly talking about moving to the city.\n" +
+      "Vince is journaling about “new connections”.\n" +
+      "Hana is pacing like a caged himbo.\nDarcy is nowhere but somehow everywhere.\n\n" +
+      "Belle: “Okay. No. Absolutely not. Everyone shut up.”",
+      artThirst,
+      [
+        { label: "Back Belle up", next: sceneMissionRevealSetup },
+        { label: "Let Edwina keep talking (mistake)", next: sceneWorkshopInvite }
+      ]
+    );
+  }
+
+  function sceneMissionRevealSetup() {
+    showScene(
+      "Belle steps between Edwina and literally everyone.\n\n" +
+      "Belle: “Say the quiet part out loud.”\n\n" +
+      "Edwina smiles like she’s been waiting for that line.",
+      artBelle,
+      [
+        { label: "Demand to know her real mission", next: sceneMissionReveal },
+        { label: "Stay silent and just watch", next: sceneMissionReveal }
+      ]
+    );
+  }
+
+  function sceneMissionReveal() {
+    showScene(
+      "Edwina: “Fine. Full disclosure.”\n\n" +
+      "She stands in the centre of the yard.\nThe air gets tighter.\n\n" +
+      "Edwina: “I’m here to break you all up.”\n\n" +
+      "Hana: “Like… emotionally?”\n" +
+      "Edwina: “Emotionally. Romantically. Logistically.”\n" +
+      "Belle: “Over my dead lesbian body.”",
+      artHeels,
+      [
+        { label: "Ask WHY she wants to break you up", next: sceneAskWhy },
+        { label: "Accuse her of being an agent", next: sceneAgent },
+        { label: "Let her pitch her ‘workshop’", next: sceneWorkshopInvite }
+      ]
+    );
+  }
+
+  function sceneAskWhy() {
+    showScene(
+      "You: “Why us?”\n\n" +
+      "Edwina: “Because cohesive queer farms are dangerous.\nYou’re stable. You share chores. You communicate.\nThat kind of thing terrifies people with money.”\n\n" +
+      "Nick: “That actually tracks.”\nBelle: “Stop agreeing with the villain.”",
+      "",
+      [
+        { label: "Refuse the premise", next: sceneRefuseWorkshop },
+        { label: "Hear her out anyway", next: sceneWorkshopInvite }
+      ]
+    );
+  }
+
+  function sceneAgent() {
+    showScene(
+      "You: “So you’re like… a lesbian black-ops consultant?”\n\n" +
+      "Edwina laughs.\n“Something like that.”\n\nBelle: “No. Exactly that.”",
+      "",
+      [
+        { label: "Insist she leave now", next: sceneHardRefusal },
+        { label: "Ask what happens if you say yes", next: sceneWorkshopInvite }
+      ]
+    );
+  }
+
+  function sceneHardRefusal() {
+    state.belleTrustsYou += 1;
+    showScene(
+      "Belle: “Pack up your ridiculous clipboard and go.”\n\n" +
+      "Edwina: “I’ll go… if they want me to.”\n\n" +
+      "Everyone suddenly looks very avoidant.",
+      artThirst,
+      [
+        { label: "Try to rally the group to vote her out", next: sceneVoteOut },
+        { label: "Realise they kind of want the drama", next: sceneWorkshopInvite }
+      ]
+    );
+  }
+
+  function sceneVoteOut() {
+    showScene(
+      "You: “Hands up if you want her gone.”\n\n" +
+      "Belle raises her hand immediately.\nThe goats raise theirs metaphorically.\n\n" +
+      "Nick half raises his, then lowers it when Edwina looks at him.\n" +
+      "Vince doesn’t raise his at all.\nHana pretends to be stretching.\nDarcy has vanished.\n\n" +
+      "Belle: “Unbelievable.”",
+      artBelle,
+      [
+        { label: "Accept you’re outvoted: workshop time", next: sceneWorkshopInvite },
+        { label: "Storm off with Belle", next: sceneBelleStorms }
+      ]
+    );
+  }
+
+  function sceneBelleStorms() {
+    showScene(
+      "Belle storms toward the barn.\nYou follow.\n\n" +
+      "Belle: “If they want to be emotionally colonised by a glossed-up chaos demon,\nthat’s on them. But we are NOT letting this farm actually break.”",
+      artBelle,
+      [
+        { label: "Help her sabotage the workshop later", next: sceneWorkshopSetup },
+        { label: "Try to talk her into attending", next: sceneWorkshopInvite }
+      ]
+    );
+  }
+
+  function sceneRefuseWorkshop() {
+    showScene(
+      "You: “We don’t need your… cream intervention.”\n\n" +
+      "Edwina: “Your group thinks otherwise.”\n\n" +
+      "Everyone else: very determinedly not making eye contact.",
+      artThirst,
+      [
+        { label: "Stand your ground with Belle", next: sceneWorkshopSetup },
+        { label: "Sigh and agree to watch carefully", next: sceneWorkshopInvite }
+      ]
+    );
+  }
+
+  // ---- workshop ----
+
+  function sceneWorkshopInvite() {
+    state.edwinaInfluence += 2;
+    state.almostBrokeUp = true;
+    showScene(
+      "Edwina claps her hands once.\n\n" +
+      "“Let’s move to the barn,” she says. “We’ll do a little… cream workshop.”\n\n" +
+      "Vince: “This is definitely a bad idea.”\nNick: “I’m still going.”\nHana: “Team-building… but sexy?”\n\n" +
+      "Belle: “I hate all of you, but I’m not leaving.”",
+      artWorkshop,
+      [
+        { label: "Attend, but sit with Belle", next: sceneWorkshopSetup },
+        { label: "Sit close to Edwina (danger)", next: sceneWorkshopDeep },
+        { label: "Lurk with Darcy in the rafters", next: sceneWorkshopRafters }
+      ]
+    );
+  }
+
+  function sceneWorkshopSetup() {
+    showScene(
+      "The barn is lit with fairy lights.\nRugs on the floor. Cushions. Bowls of grapes. It’s obscene.\n\n" +
+      "Edwina stands in the middle like a cult leader.\nBelle refuses to sit. You hover near her.\n\n" +
+      "Edwina: “Tonight, we explore your… attachments.”",
+      artWorkshop,
+      [
+        { label: "Back Belle up verbally", next: sceneBelleSpeech },
+        { label: "Let Edwina run the first exercise", next: sceneWorkshopExercise1 }
+      ]
+    );
+  }
+
+  function sceneWorkshopDeep() {
+    state.edwinaInfluence += 1;
+    showScene(
+      "You sit near Edwina.\nHer presence is like a ring-light for your nervous system.\n\n" +
+      "Belle is watching you with pure disappointment.",
+      artWorkshop,
+      [
+        { label: "Realise you’ve gone too far", next: sceneWorkshopSetup },
+        { label: "Lean fully into the chaos", next: sceneWorkshopExercise1 }
+      ]
+    );
+  }
+
+  function sceneWorkshopRafters() {
+    showScene(
+      "You climb into the rafters with Darcy.\nFrom here you see everything.\n\n" +
+      "Darcy: “She wants to fracture the web.”\nYou: “Is that a metaphor?”\nDarcy: “I can see aura threads.”",
+      artWorkshop,
+      [
+        { label: "Whisper commentary with Darcy", next: sceneWorkshopExercise1 },
+        { label: "Drop down dramatically later", next: sceneBelleSpeech }
+      ]
+    );
+  }
+
+  function sceneWorkshopExercise1() {
+    showScene(
+      "Edwina: “First exercise. Say one thing you resent about this farm.”\n\n" +
+      "Nick: “Sometimes I feel like my ideas are too much.”\n" +
+      "Vince: “Sometimes I feel like my feelings are too much.”\n" +
+      "Hana: “Sometimes I feel like my strength is too much.”\n\n" +
+      "Edwina: “See? You’re all ‘too much’. Maybe you’d be… freer apart.”\n\n" +
+      "The air goes very still.",
+      artThirst,
+      [
+        { label: "Break the spell with a joke", next: sceneBreakSpellJoke },
+        { label: "Let Belle step in", next: sceneBelleSpeech }
+      ]
+    );
+  }
+
+  function sceneBreakSpellJoke() {
+    showScene(
+      "You: “Yeah, but if we split up, who would feed the goats? You?”\n\n" +
+      "One of the goats sneezes on Edwina’s shoe.\nThe group cracks a tiny smile.\n\n" +
+      "Belle: “…okay, that helped.”",
+      "",
+      [
+        { label: "Encourage Belle to speak", next: sceneBelleSpeech },
+        { label: "Ask Edwina what SHE resents", next: sceneTurnTables }
+      ]
+    );
+  }
+
+  function sceneTurnTables() {
+    showScene(
+      "You: “What about you, Edwina? What do YOU resent?”\n\n" +
+      "She actually hesitates.\n\n" +
+      "Edwina: “I resent… that groups like yours exist while most people stay stuck.”\n" +
+      "She looks genuinely angry for a second.\nBelle sees the crack.",
+      "",
+      [
+        { label: "Let Belle attack that logic", next: sceneBelleSpeech },
+        { label: "Ask if she ever had a farm like this", next: sceneSoftEdwina }
+      ]
+    );
+  }
+
+  function sceneSoftEdwina() {
+    showScene(
+      "You: “Did you ever have something like this? A group that held you?”\n\n" +
+      "The barn feels too quiet.\n\n" +
+      "Edwina: “I had… teams. Units. Operations.”\nShe smiles without warmth.\n\n" +
+      "Belle: “So no.”",
+      "",
+      [
+        { label: "Push for her to leave", next: sceneFinalChoice },
+        { label: "Offer her a seat like a normal guest", next: sceneEdwinaInvited }
+      ]
+    );
+  }
+
+  function sceneBelleSpeech() {
+    showScene(
+      "Belle finally snaps.\n\n" +
+      "Belle: “Okay. Enough. You’re not here to help. You’re here to make us\n" +
+      "doubt what we already know: that this messy little farm is working.”\n\n" +
+      "She points at Nick.\n“Your ideas are not too much. They built half our projects.”\n" +
+      "At Vince: “Your feelings keep us honest.”\n" +
+      "At Hana: “Your strength has literally saved our lives at least twice.”\n" +
+      "At Darcy: “You’re freaky as hell but you always show up.”\n\n" +
+      "Belle: “We are not perfect. But we are ours. You don’t get to break that.”",
+      artBelle,
+      [
+        { label: "Back Belle up loudly", next: sceneFinalChoice },
+        { label: "Stay quiet but stand with her physically", next: sceneFinalChoice }
+      ]
+    );
+  }
+
+  function sceneEdwinaInvited() {
+    showScene(
+      "You pull out a cushion.\n\n" +
+      "You: “If you stay, it’s as a guest. Not a handler. Not a consultant.\nJust… someone who can help with dishes.”\n\n" +
+      "The offer hangs there.\nBelle looks murderous, but also impressed you’re that bold.",
+      "",
+      [
+        { label: "Let Edwina decide", next: sceneFinalChoice }
+      ]
+    );
+  }
+
+  function sceneFinalChoice() {
+    let text =
+      "Edwina looks around the circle.\nHer eyes land on Belle.\nThen on you.\nThen on the goats.\n\n";
+
+    if (state.belleTrustsYou >= 2) {
+      text +=
+        "Belle: “You heard them. If you stay, you’re one of us. No psy-ops. No missions.\nJust chores and feelings and mud.”\n\n";
+    } else {
+      text +=
+        "Belle: “I want her gone. But if you all choose otherwise, I’ll adapt.\nReluctantly. Loudly.”\n\n";
+    }
+
+    text += "Edwina takes off her clipboard lanyard like it’s a weapon she’s laying down.\n";
+
+    showScene(
+      text,
+      "",
+      [
+        { label: "Tell her to leave", next: sceneEndingEjected },
+        { label: "Let her stay under strict rules", next: sceneEndingStays }
+      ]
+    );
+  }
+
+  function sceneEndingEjected() {
+    showScene(
+      "You: “No. Leave the farm.”\n\n" +
+      "Belle exhales like a storm passing.\nThe others look conflicted, but no one stops you.\n\n" +
+      "Edwina smiles, almost fond.\n“Well. That’s one way to end a mission.”\n\n" +
+      "She walks out into the dark.\nThe goats watch her go. So do you.",
+      artEject,
+      [
+        { label: "Soft farm epilogue", next: sceneEpilogueSoft }
+      ]
+    );
+  }
+
+  function sceneEndingStays() {
+    showScene(
+      "You: “Stay. But drop the whole ‘I HAD CREAM’ act.”\n\n" +
+      "Edwina laughs softly.\n\n" +
+      "Belle: “If you manipulate ANYONE, I’m feeding you to the compost heap.”\n" +
+      "Edwina: “Understood.”\n\n" +
+      "The farm will never be the same.\nBut maybe… in a way that isn’t completely terrible.",
+      artStay,
+      [
+        { label: "Live with the chaos", next: sceneEpilogueSoft }
+      ]
+    );
+  }
+
+  function sceneEpilogueSoft() {
+    let extra = "";
+
+    if (state.almostBrokeUp) {
+      extra = "Later, when the lights are low, someone admits:\n" +
+              "“I really thought we were going to fall apart.”\n\n" +
+              "Someone else says:\n“Yeah. But we didn’t.”\n\n";
+    } else {
+      extra = "Somehow, you dodged a total meltdown.\n" +
+              "It still feels like the emotional version of a near-miss car crash.\n\n";
+    }
+
+    showScene(
+      "That night, the barn is quiet.\nNo workshops. No clipboards. Just\ntea, flannel, and tired laughter.\n\n" +
+      extra +
+      "Outside, the goats chew in the dark.\nInside, the farm reboots.\n\n" +
+      "Tomorrow there will be chores.\nAnd feelings.\nAnd probably another disaster.\n\n" +
+      "For now, you rest.\n\n" +
+      "[ END OF EPISODE – I HAD CREAM ]",
+      artSoft,
+      [
+        { label: "Replay from the beginning", next: startGame }
+      ]
+    );
+  }
+
+  // start the game
+  startGame();
+</script>
+</body>
+</html>
